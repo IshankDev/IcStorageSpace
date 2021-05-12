@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:ic_storage_space/ic_storage_space.dart';
 
 void main() {
@@ -14,7 +13,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   int _totalSpace = 0;
   int _freeSpace = 0;
   int _usedSpace = 0;
@@ -23,36 +21,20 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    int totalSpace;
-    int freeSpace;
-    int usedSpace;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await IcStorageSpace.platformVersion;
-      totalSpace = await IcStorageSpace.getTotalDiskSpaceInBytes;
-      freeSpace = await IcStorageSpace.getFreeDiskSpaceInBytes;
-      usedSpace = await IcStorageSpace.getUsedDiskSpaceInBytes;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+  Future<String> getStorageSpaceInfo() async {
+    int totalSpace = await IcStorageSpace.getTotalDiskSpaceInBytes;
+    int freeSpace = await IcStorageSpace.getFreeDiskSpaceInBytes;
+    int usedSpace = await IcStorageSpace.getUsedDiskSpaceInBytes;
 
     setState(() {
-      _platformVersion = platformVersion;
       _totalSpace = (totalSpace / forMB).round();
       _freeSpace = (freeSpace / forMB).round();
       _usedSpace = (usedSpace / forMB).round();
     });
+
+    return 'Total Space - $totalSpace\n\nFree Space - $freeSpace\n\nUsed Space - $usedSpace';
   }
 
   @override
@@ -65,12 +47,6 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Text('Running on: $_platformVersion'),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Center(
@@ -89,6 +65,12 @@ class _MyAppState extends State<MyApp> {
                 child: Text('Used Space - $_usedSpace MB'),
               ),
             ),
+            ElevatedButton(
+              onPressed: () async {
+                await getStorageSpaceInfo();
+              },
+              child: Text('Get Storage Info'),
+            )
           ],
         ),
       ),
