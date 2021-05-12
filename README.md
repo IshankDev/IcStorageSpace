@@ -20,10 +20,10 @@ class MyWidget extends StatelessWidget {
     int freeSpace = await IcStorageSpace.getFreeDiskSpaceInBytes;
     int usedSpace = await IcStorageSpace.getUsedDiskSpaceInBytes;
 
-
+    
     return 'Total Space - $totalSpace\n\nFree Space - $freeSpace\n\nUsed Space - $usedSpace';
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
