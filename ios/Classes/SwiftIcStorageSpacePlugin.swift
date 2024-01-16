@@ -14,6 +14,8 @@ public class SwiftIcStorageSpacePlugin: NSObject, FlutterPlugin {
             result(UIDevice.current.totalDiskSpaceInBytes)
         case "getFreeDiskSpaceInBytes":
             result(UIDevice.current.freeDiskSpaceInBytes)
+        case "storageStats":
+            result(UIDevice.current.storageStats)
         default:
             result(0.0)
         }
@@ -52,6 +54,9 @@ extension UIDevice {
         }
     }
 
+    var storageStats:Int64 {
+        return 0
+    }
 }
 
 

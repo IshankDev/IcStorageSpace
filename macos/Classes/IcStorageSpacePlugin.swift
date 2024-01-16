@@ -31,6 +31,11 @@ public class IcStorageSpacePlugin: NSObject, FlutterPlugin {
       }
     }
 
+   private func storageStats() -> Int64 {
+      guard let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String),
+          let space = (systemAttributes[FileAttributeKey.systemSize] as? NSNumber)?.int64Value else { return 0 }
+      return space
+    }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
@@ -40,6 +45,8 @@ public class IcStorageSpacePlugin: NSObject, FlutterPlugin {
       result(totalDiskSpaceInBytes())
     case "getFreeDiskSpaceInBytes":
       result(freeDiskSpaceInBytes())
+    case "storageStats":
+      result(storageStats())
     default:
       result(FlutterMethodNotImplemented)
     }

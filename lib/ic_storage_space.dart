@@ -22,6 +22,11 @@ class IcStorageSpace {
     return freeDiskSpace;
   }
 
+  static Future<Map<String, int>> get storageStats async {
+    return await _channel.invokeMethod('storageStats');
+  }
+
+
   static Future<int> get getUsedDiskSpaceInBytes async {
     return (await getTotalDiskSpaceInBytes) - (await getFreeDiskSpaceInBytes);
   }
