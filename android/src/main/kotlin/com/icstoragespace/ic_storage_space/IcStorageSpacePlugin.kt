@@ -17,6 +17,7 @@ import android.os.storage.StorageManager
 import android.app.usage.StorageStats
 import android.app.usage.StorageStatsManager
 
+import java.io.File
 import java.io.IOException
 import java.util.UUID
 
@@ -41,6 +42,8 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
             "getFreeDiskSpaceInBytes" -> result.success(getFreeDiskSpaceInBytes())
             "getTotalDiskSpaceInBytes" -> result.success(getTotalDiskSpaceInBytes())
             "storageStats" -> result.success(storageStats())
+            "clearAllCache" -> result.success(clearAllCache())
+            "deletePath" -> result.success(deletePath(call.argument("path")))
             else -> result.notImplemented()
         }
     }
@@ -109,5 +112,60 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
         map["cacheBytes"] = cacheBytes.toLong()
         map["dataBytes"] = dataBytes.toLong()
         return map
+    }
+
+    private fun clearAllCache(): Boolean {
+        try {
+            val cacheDir = context.cacheDir
+            val filesDir = context.filesDir
+
+            // 清除内部缓存目录中的文件
+            deleteFiles(cacheDir)
+
+            // 清除内部文件目录中的文件
+            deleteFiles(filesDir)
+
+            // 如果应用程序有外部缓存目录，也可以清除外部缓存目录中的文件
+            if (android.os.Environment.getExternalStorageState() == android.os.Environment.MEDIA_MOUNTED) {
+                val externalCacheDir = context.externalCacheDir
+                if (externalCacheDir != null) {
+                    deleteFiles(externalCacheDir)
+                }
+            }
+
+            return true // 清理缓存成功
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false // 清理缓存失败
+        }
+    }
+
+    private fun deletePath(path: String?): Boolean {
+        if (path.isNullOrEmpty()) {
+            return false
+        }
+        val dir = File(path)
+        deleteFiles(dir)
+        return true
+    }
+
+    private fun deleteFiles(dir: File): Boolean {
+        println("deleteFiles: ${dir.path}") // 打印列表
+        try {
+            if (dir.isDirectory) {
+                val children = dir.list()
+                children?.forEach { fileName ->
+                    val file = File(dir, fileName)
+                    // 递归删除子目录和文件
+                    deleteFiles(file)
+                }
+            }
+            // 删除当前目录
+            dir.delete()
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false // 清理缓存失败
+        }
     }
 }

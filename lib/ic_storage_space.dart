@@ -25,4 +25,12 @@ class IcStorageSpace {
   static Future<int> get getUsedDiskSpaceInBytes async {
     return (await getTotalDiskSpaceInBytes) - (await getFreeDiskSpaceInBytes);
   }
+
+  static Future<bool> clearAllCache() async {
+    return await _channel.invokeMethod('clearAllCache');
+  }
+
+  static Future<bool> deletePath(String path) async {
+    return await _channel.invokeMethod('deletePath', {'path': path});
+  }
 }
