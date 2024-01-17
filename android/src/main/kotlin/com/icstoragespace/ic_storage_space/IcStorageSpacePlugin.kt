@@ -31,7 +31,6 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.getApplicationContext()
-        print("context.packageName ${context.getPackageName()}")
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ic_storage_space")
         channel.setMethodCallHandler(this)
     }
@@ -77,10 +76,10 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
     }
 
     /**
-     * 获取当前应用的存储信息
+     * 获取当前应用的存储信息 Added in API level 26
      * Obtain storage information about the current application
-     * start 8.0
-     * Methods are no longer compatible with 7.0
+     * start 8.0 Methods are no longer compatible with 7.0
+     * https://developer.android.com/reference/android/app/usage/StorageStats#getDataBytes()
      */
     private fun storageStats(): Map<String, Long> {
         var packageName = context.getPackageName()
@@ -105,10 +104,10 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
                 dataBytes += storageStats.getDataBytes()
             }
         }
-        return {
-            'appBytes': appBytes.toLong(), // App 包括安装包
-            'cacheBytes': cacheBytes.toLong(), // 软件的缓存 (内部缓存 外部缓存 加code_cache 一起返回的)
-            'dataBytes': dataBytes.toLong(), // 用户的数据
-        }
+        val map: MutableMap<String, Long> = mutableMapOf()
+        map["appBytes"] = appBytes.toLong()
+        map["cacheBytes"] = cacheBytes.toLong()
+        map["dataBytes"] = dataBytes.toLong()
+        return map
     }
 }
