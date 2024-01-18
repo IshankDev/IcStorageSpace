@@ -17,7 +17,7 @@ class IcStorageSpace {
     return await _channel.invokeMethod('getFreeDiskSpaceInBytes');
   }
 
-  /// return {"appBytes":0, "cacheBytes":0, "dataBytes":0}
+  /// return {"appBytes":0, "cacheBytes":0, "dataBytes":0, "appCacheBytes":0}
   static Future<Map<dynamic, dynamic>> get storageStats async {
     return await _channel.invokeMethod('storageStats');
   }
@@ -32,5 +32,18 @@ class IcStorageSpace {
 
   static Future<bool> deletePath(String path) async {
     return await _channel.invokeMethod('deletePath', {'path': path});
+  }
+
+  static Future<int?> pathBytes(String path) async {
+    return await _channel.invokeMethod('pathBytes', {'path': path});
+  }
+
+  static Future<List<Object?>> pathList(String path) async {
+    List<Object?> items =  await _channel.invokeMethod('pathList', {'path': path});
+    return items;
+  }
+
+  static Future<String> homeDirectory() async {
+    return await _channel.invokeMethod('homeDirectory');
   }
 }

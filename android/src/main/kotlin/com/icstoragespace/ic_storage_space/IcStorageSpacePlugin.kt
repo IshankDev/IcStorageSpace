@@ -43,7 +43,10 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
             "getTotalDiskSpaceInBytes" -> result.success(getTotalDiskSpaceInBytes())
             "storageStats" -> result.success(storageStats())
             "clearAllCache" -> result.success(clearAllCache())
+            "homeDirectory" -> result.success(Environment.getExternalStorageDirectory().absolutePath)
             "deletePath" -> result.success(deletePath(call.argument("path")))
+            "pathBytes" -> result.success(pathBytes(call.argument("path")))
+            "pathList" -> result.success(pathList(call.argument("path")))
             else -> result.notImplemented()
         }
     }
@@ -84,7 +87,7 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
      * start 8.0 Methods are no longer compatible with 7.0
      * https://developer.android.com/reference/android/app/usage/StorageStats#getDataBytes()
      */
-    private fun storageStats(): Map<String, Long> {
+    private fun storageStats(): Map<String, Long?> {
         var packageName = context.getPackageName()
         val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
         val storageStatsManager = context.getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
@@ -107,23 +110,75 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
                 dataBytes += storageStats.getDataBytes()
             }
         }
-        val map: MutableMap<String, Long> = mutableMapOf()
-        map["appBytes"] = appBytes.toLong()
+        val map: MutableMap<String, Long?> = mutableMapOf()
         map["cacheBytes"] = cacheBytes.toLong()
         map["dataBytes"] = dataBytes.toLong()
+        map["appBytes"] = appBytes.toLong()
+        map["appCacheBytes"] = fileBytes(context.cacheDir)
         return map
+    }
+
+    private fun pathList(path: String?): List<String> {
+        if (path.isNullOrEmpty()) {
+            return getAllFilesAndDirectories(context.filesDir)
+        } else {
+            return getAllFilesAndDirectories(File(path))
+        }
+    }
+
+    /**
+     * 获取特定目录下面所有的目录及文件 路径列表
+     */
+    private fun getAllFilesAndDirectories(directory: File): List<String> {
+        val filePaths = mutableListOf<String>()
+        if (directory.isDirectory) {
+            val files = directory.listFiles()
+
+            if (files != null) {
+                for (file in files) {
+                    if (file.isFile) {
+                        filePaths.add(file.absolutePath)
+                    } else if (file.isDirectory) {
+                        filePaths.addAll(getAllFilesAndDirectories(file))
+                    }
+                }
+            }
+        }
+        return filePaths;
+    }
+
+    private fun pathBytes(path: String?): Long? {
+        if (path.isNullOrEmpty()) {
+            return null
+        }
+        return  fileBytes(File(path))
+    }
+
+    private fun fileBytes(f: File): Long {
+        var size: Long = 0
+        if (f.isFile) {
+            size += f.length()
+        } else if (f.isDirectory) {
+            val files = f.listFiles()
+            if (files != null) {
+                for (file in files) {
+                    size += if (file.isFile) file.length() else fileBytes(file)
+                }
+            }
+        }
+        return size
     }
 
     private fun clearAllCache(): Boolean {
         try {
             val cacheDir = context.cacheDir
-            val filesDir = context.filesDir
+            // val filesDir = context.filesDir
 
             // 清除内部缓存目录中的文件
             deleteFiles(cacheDir)
 
             // 清除内部文件目录中的文件
-            deleteFiles(filesDir)
+            // deleteFiles(filesDir)
 
             // 如果应用程序有外部缓存目录，也可以清除外部缓存目录中的文件
             if (android.os.Environment.getExternalStorageState() == android.os.Environment.MEDIA_MOUNTED) {
