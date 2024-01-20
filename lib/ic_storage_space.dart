@@ -17,7 +17,7 @@ class IcStorageSpace {
     return await _channel.invokeMethod('getFreeDiskSpaceInBytes');
   }
 
-  /// return {"appBytes":0, "cacheBytes":0, "dataBytes":0, "appCacheBytes":0}
+  /// return {"appBytes":0, "cacheBytes":0, "dataBytes":0}
   static Future<Map<dynamic, dynamic>> get storageStats async {
     return await _channel.invokeMethod('storageStats');
   }

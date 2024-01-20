@@ -104,19 +104,19 @@ extension UIDevice {
     var storageStats: [String: Int64] {
         // FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.path
         // 等价于 NSHomeDirectory() + "/Library/Caches"
+        var cache = pathBytes(path: NSHomeDirectory() + "/Library/Caches")
+        cache += pathBytes(path: NSHomeDirectory() + "/tmp")
         let stats: [String: Int64] = [
             "appBytes": pathBytes(path: Bundle.main.bundlePath as String),
-            "cacheBytes": pathBytes(path: NSHomeDirectory() + "/Library/Caches"),
             "dataBytes": pathBytes(path: NSHomeDirectory() + "/Documents"),
-            "appCacheBytes": pathBytes(path: NSHomeDirectory() + "/Library/Caches"),
-            //"cacheBytes2": pathBytes(path: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.path),
-            //"dataBytes2": pathBytes(path: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.path),
+            "cacheBytes": cache,
         ]
         print("storage_space_swift stats: \(stats)")
         return stats
     }
 
     var clearAllCache: Bool {
+        deleteFiles(path: NSHomeDirectory() + "/tmp")
         deleteFiles(path: NSHomeDirectory() + "/Library/Caches")
         return true
     }

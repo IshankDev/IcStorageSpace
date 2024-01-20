@@ -114,7 +114,6 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
         map["cacheBytes"] = cacheBytes.toLong()
         map["dataBytes"] = dataBytes.toLong()
         map["appBytes"] = appBytes.toLong()
-        map["appCacheBytes"] = fileBytes(context.cacheDir)
         return map
     }
 
@@ -176,6 +175,7 @@ class IcStorageSpacePlugin : FlutterPlugin, MethodCallHandler {
 
             // 清除内部缓存目录中的文件
             deleteFiles(cacheDir)
+            deleteFiles(context.getCodeCacheDir())
 
             // 清除内部文件目录中的文件
             // deleteFiles(filesDir)

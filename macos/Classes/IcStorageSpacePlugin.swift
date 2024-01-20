@@ -58,20 +58,19 @@ public class IcStorageSpacePlugin: NSObject, FlutterPlugin {
         // FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.path
         // 等价于 NSHomeDirectory() + "/Library/Caches"
         // NSHomeDirectory()  为  home /Users/leeyi/Library/Containers/pub.imboy.macos/Data
-        print("storage_space_swift Bundle.main.bundlePath: \(Bundle.main.bundlePath)")
+        var cache = pathBytes(path: NSHomeDirectory() + "/Library/Caches")
+        cache += pathBytes(path: NSHomeDirectory() + "/tmp")
         let stats: [String: Int64] = [
             "appBytes": pathBytes(path: Bundle.main.bundlePath as String),
-            "cacheBytes": pathBytes(path: NSHomeDirectory() + "/Library/Caches"),
             "dataBytes": pathBytes(path: NSHomeDirectory() + "/Documents"),
-            "appCacheBytes": pathBytes(path: NSHomeDirectory() + "/Library/Caches"),
-            //"cacheBytes2": pathBytes(path: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.path),
-            //"dataBytes2": pathBytes(path: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.path),
+            "cacheBytes": cache,
         ]
         print("storage_space_swift stats: \(stats)")
         return stats
     }
 
   private func clearAllCache() -> Bool {
+    deleteFiles(path: NSHomeDirectory() + "/tmp")
     deleteFiles(path: NSHomeDirectory() + "/Library/Caches")
     return true
   }
