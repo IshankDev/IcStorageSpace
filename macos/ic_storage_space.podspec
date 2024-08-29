@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'ic_storage_space'
-  s.version          = '0.0.1'
+  s.version          = '0.1.1'
   s.summary          = 'Flutter storage space plugin for Android, IOS and MacOS'
   s.description      = <<-DESC
 Flutter storage space plugin for Android, IOS and MacOS

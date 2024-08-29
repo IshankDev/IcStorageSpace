@@ -1,11 +1,10 @@
 name: ic_storage_space
 description: Flutter storage space plugin for Android, IOS, and macOS to provide the Total storage space, Free storage space, and used storage space. Users can use this plugin any time on defined Platforms.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/IshankDev/IcStorageSpace
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=1.20.0"
+  sdk: ">=2.17.0 <=5.0.0"
 
 dependencies:
   flutter:
